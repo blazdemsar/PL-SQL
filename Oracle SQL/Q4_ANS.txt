@@ -1,0 +1,197 @@
+SQL> ----QUESTION 1
+SQL> SELECT ENAME FROM (
+  2  SELECT F.ENAME FROM EMP E, EMP F WHERE E.MGR=F.EMPNO)
+  3  GROUP BY ENAME
+  4  HAVING COUNT(*) >= 1;
+
+ENAME
+----------
+JONES
+KING
+CLARK
+SCOTT
+BLAKE
+FORD
+
+6 rows selected.
+
+SQL> ----QUESTION 2
+SQL> SELECT MAX(SAL), JOB FROM EMP WHERE JOB IS NOT NULL GROUP BY JOB;
+
+  MAX(SAL) JOB
+---------- ---------
+      1300 CLERK
+      1600 SALESMAN
+      3000 ANALYST
+      2975 MANAGER
+      5000 PRESIDENT
+
+SQL> ----QUESTION 3
+SQL> select to_char(hiredate, 'yyyy') "year", count(empno) "No. of employees"
+  2  from emp
+  3  group by to_char(hiredate, 'yyyy')
+  4  having count(empno) = (select max(count(empno))
+  5  from emp
+  6  group by to_char(hiredate, 'yyyy'));
+
+year No. of employees
+---- ----------------
+1981               10
+
+SQL> ----QUESTION 4
+SQL> SELECT ENAME, SAL, DEPTNO FROM EMP E WHERE SAL > (SELECT AVG(SAL) FROM EMP WHERE DEPTNO=E.DEPTNO);
+
+ENAME             SAL     DEPTNO
+---------- ---------- ----------
+ALLEN            1600         30
+JONES            2975         20
+BLAKE            2850         30
+SCOTT            3000         20
+KING             5000         10
+FORD             3000         20
+
+6 rows selected.
+
+SQL> ----QUESTION 5
+SQL> select * from (
+  2  select dense_rank() over(order by sal desc) as rank, sal from emp)
+  3  where rank=6;
+
+      RANK        SAL
+---------- ----------
+         6       2450
+
+SQL> ----QUESTION 6
+SQL> SELECT EMPNO, COUNT(*) FROM EMP GROUP BY EMPNO HAVING COUNT(*) > 1;
+
+no rows selected
+
+SQL> ----QUESTION 7
+SQL> select ename "EMPLOYEE", to_char(trunc(months_between(sysdate, hiredate)/12))
+  2  ||' years '|| to_char(trunc(mod(months_between(sysdate, hiredate), 12)))
+  3  ||' months ' "length of service"
+  4  from emp;
+
+EMPLOYEE
+----------
+length of service
+-----------------------------------------------------------------------------------------------
+SMITH
+39 years 6 months
+
+ALLEN
+39 years 4 months
+
+WARD
+39 years 4 months
+
+JONES
+39 years 2 months
+
+MARTIN
+38 years 9 months
+
+BLAKE
+39 years 2 months
+
+CLARK
+39 years 0 months
+
+EMPLOYEE
+----------
+length of service
+-----------------------------------------------------------------------------------------------
+
+SCOTT
+37 years 6 months
+
+KING
+38 years 7 months
+
+TURNER
+38 years 9 months
+
+ADAMS
+37 years 5 months
+
+JAMES
+38 years 6 months
+
+FORD
+38 years 6 months
+
+MILLER
+
+EMPLOYEE
+----------
+length of service
+-----------------------------------------------------------------------------------------------
+38 years 5 months
+
+BLAZ
+ years  months
+
+DOMEN
+ years  months
+
+
+16 rows selected.
+
+SQL> ----QUESTION 8
+SQL> DELETE FROM EMP WHERE EMPNO NOT IN (
+  2  SELECT MAX(EMPNO) FROM EMP GROUP BY EMPNO);
+
+0 rows deleted.
+
+SQL> ----QUESTION 9
+SQL> select * from emp where (ename, job, mgr, hiredate, sal, comm, deptno) in (
+  2  select ename, job, mgr, hiredate, sal, comm, deptno from emp
+  3  group by ename, job, mgr, hiredate, sal, comm, deptno
+  4  having count(*) > 1)
+  5  order by ename, job, mgr, hiredate, sal, comm, deptno;
+
+no rows selected
+
+SQL> ----QUESTION 10
+SQL> select * from (
+  2  select * from emp order by empno desc)
+  3  where rownum <= 1
+  4  order by rownum desc;
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      8000 BLAZ
+
+SQL> ----QUESTION 11
+JOB         COUNT(*)
+--------- ----------
+CLERK              4
+ANALYST            2
+SALESMAN           4
+MANAGER            3
+                   2
+PRESIDENT          1
+
+6 rows selected.
+
+SQL> ----QUESTION 12
+SQL> select job, max(sal) over(partition by job) from emp where sal is not null and job is not null;
+
+JOB       MAX(SAL)OVER(PARTITIONBYJOB)
+--------- ----------------------------
+ANALYST                           3000
+ANALYST                           3000
+CLERK                             1300
+CLERK                             1300
+CLERK                             1300
+CLERK                             1300
+MANAGER                           2975
+MANAGER                           2975
+MANAGER                           2975
+PRESIDENT                         5000
+SALESMAN                          1600
+SALESMAN                          1600
+SALESMAN                          1600
+SALESMAN                          1600
+
+14 rows selected.

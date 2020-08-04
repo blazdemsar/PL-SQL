@@ -1,0 +1,85 @@
+SQL> ----Question 1
+SQL> select ename, sal, deptno, job, sum(sal) over(partition by job) as "Total salary per job" from emp;
+
+ENAME             SAL     DEPTNO JOB       Total salary per job
+---------- ---------- ---------- --------- --------------------
+SCOTT            3000         20 ANALYST                   6000
+FORD             3000         20 ANALYST                   6000
+MILLER           1300         40 CLERK                     4150
+JAMES             950         30 CLERK                     4150
+SMITH             800         20 CLERK                     4150
+ADAMS            1100         20 CLERK                     4150
+BLAKE            2850         30 MANAGER                   8275
+JONES            2975         20 MANAGER                   8275
+CLARK            2450         10 MANAGER                   8275
+KING             5000         10 PRESIDENT                 5000
+TURNER           1500         30 SALESMAN                  5600
+MARTIN           1250         30 SALESMAN                  5600
+WARD             1250         30 SALESMAN                  5600
+ALLEN            1600         30 SALESMAN                  5600
+
+14 rows selected.
+
+SQL> ----Question 2
+SQL> select sal from emp
+  2  minus
+  3  select sal from emp where rownum < (
+  4  (select count(*) from emp) /2);
+
+       SAL
+----------
+       950
+      1100
+      1300
+      1500
+      2450
+      3000
+      5000
+
+7 rows selected.
+
+SQL> ----Question 3
+SQL> select ename from (
+  2  select dense_rank() over(order by sal desc) as rank, ename from emp)
+  3  where rank<6;
+
+ENAME
+----------
+KING
+SCOTT
+FORD
+JONES
+BLAKE
+CLARK
+
+6 rows selected.
+
+SQL> ----Question 4
+SQL> select ename, job from (
+  2  select f.ename, f.job from emp e, emp f where e.mgr=f.empno)
+  3  group by ename, job
+  4  having count(*) > 1;
+
+ENAME      JOB
+---------- ---------
+JONES      MANAGER
+KING       PRESIDENT
+BLAKE      MANAGER
+
+SQL> ----Question 5
+SQL> select sum(sal) from (
+  2  select sal from emp
+  3  minus
+  4  select sal from emp where rownum < (
+  5  (select count(*) from emp) / 2));
+
+  SUM(SAL)
+----------
+     15300
+
+SQL> ----Question 6
+SQL> select count(*) from emp where ename like 'A%S';
+
+  COUNT(*)
+----------
+         1

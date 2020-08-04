@@ -1,0 +1,195 @@
+SQL> CREATE TABLE TEST1
+  2  (LOCATION VARCHAR(30),
+  3  EMPNO NUMBER(4),
+  4  ENAME VARCHAR2
+  5  .
+SQL> CREATE TABLE TEST1
+  2  (LOCATION VARCHAR2(30),
+  3  EMPNO NUMBER(4),
+  4  ENAME VARCHAR2(20) NOT NULL,
+  5  SAL NUMBER(10) CHECK (SAL>2000),
+  6  MOBILE NUMBER(11) DEFAULT 8383838,
+  7  PRIMARY KEY(LOCATION, EMPNO));
+
+Table created.
+
+SQL> DESC TEST1;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ LOCATION                                  NOT NULL VARCHAR2(30)
+ EMPNO                                     NOT NULL NUMBER(4)
+ ENAME                                     NOT NULL VARCHAR2(20)
+ SAL                                                NUMBER(10)
+ MOBILE                                             NUMBER(11)
+
+SQL> SELECT CONSTRAINT_NAME FROM USER_CONSTRAINTS WHERE TABLE_NAME='TEST1';
+
+CONSTRAINT_NAME                                                                 
+--------------------------------------------------------------------------------
+SYS_C008567                                                                     
+SYS_C008568                                                                     
+SYS_C008569                                                                     
+
+SQL> ALTER TABLE TEST1 DROP CONSTRAINT PK;
+ALTER TABLE TEST1 DROP CONSTRAINT PK
+                                  *
+ERROR at line 1:
+ORA-02443: Cannot drop constraint  - nonexistent constraint 
+
+
+SQL> ALTER TABLE TEST1 DROP CONSTRAINT SYS_C008567;
+
+Table altered.
+
+SQL> DESC TEST1;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ LOCATION                                  NOT NULL VARCHAR2(30)
+ EMPNO                                     NOT NULL NUMBER(4)
+ ENAME                                              VARCHAR2(20)
+ SAL                                                NUMBER(10)
+ MOBILE                                             NUMBER(11)
+
+SQL> ALTER TABLE TEST1 DROP CONSTRAINT SYS_C008568;
+
+Table altered.
+
+SQL> DESC TEST1;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ LOCATION                                  NOT NULL VARCHAR2(30)
+ EMPNO                                     NOT NULL NUMBER(4)
+ ENAME                                              VARCHAR2(20)
+ SAL                                                NUMBER(10)
+ MOBILE                                             NUMBER(11)
+
+SQL> ALTER TABLE TEST1 DROP CONSTRAINT SYS_C008569;
+
+Table altered.
+
+SQL> DESC TEST1;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ LOCATION                                           VARCHAR2(30)
+ EMPNO                                              NUMBER(4)
+ ENAME                                              VARCHAR2(20)
+ SAL                                                NUMBER(10)
+ MOBILE                                             NUMBER(11)
+
+SQL> ALTER TABLE TEST1 MODIFY(ENAME VARCHAR(20) NOT NULL);
+
+Table altered.
+
+SQL> DESC TEST1;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ LOCATION                                           VARCHAR2(30)
+ EMPNO                                              NUMBER(4)
+ ENAME                                     NOT NULL VARCHAR2(20)
+ SAL                                                NUMBER(10)
+ MOBILE                                             NUMBER(11)
+
+SQL> ALTER TABLE TEST1 ADD PRIMARY KEY(EMPNO) PKENO;
+ALTER TABLE TEST1 ADD PRIMARY KEY(EMPNO) PKENO
+                                         *
+ERROR at line 1:
+ORA-01735: invalid ALTER TABLE option 
+
+
+SQL> ALTER TABLE TEST1 ADD PRIMARY KEY(EMPNO) AS PKENO;
+ALTER TABLE TEST1 ADD PRIMARY KEY(EMPNO) AS PKENO
+                                         *
+ERROR at line 1:
+ORA-01735: invalid ALTER TABLE option 
+
+
+SQL> ALTER TABLE TEST1 ADD CONSTRAINT PKENO PRIMARY KEY (EMPNO);
+
+Table altered.
+
+SQL> DESC TEST1
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ LOCATION                                           VARCHAR2(30)
+ EMPNO                                     NOT NULL NUMBER(4)
+ ENAME                                     NOT NULL VARCHAR2(20)
+ SAL                                                NUMBER(10)
+ MOBILE                                             NUMBER(11)
+
+SQL> SELECT CONSTRAINT_NAME FROM USER_CONSTRAINTS WHERE TABLE_NAME='TEST1';
+
+CONSTRAINT_NAME                                                                 
+--------------------------------------------------------------------------------
+SYS_C008570                                                                     
+PKENO                                                                           
+
+SQL> ALTER TABLE TEST1 DISABLE CONSTRAINT PKENO;
+
+Table altered.
+
+SQL> INSERT INTO TEST1 VALUES('NEW YORK', 2000, 'BLAZ', 5000, 2523278439);
+
+1 row created.
+
+SQL> INSERT INTO TEST1 VALUES('NEW YORK', 2000, 'BLAZ', 5000, 2523278439);
+
+1 row created.
+
+SQL> ALTER TABLE TEST1 ENABLE CONSTRAINT PKENO;
+ALTER TABLE TEST1 ENABLE CONSTRAINT PKENO
+*
+ERROR at line 1:
+ORA-02437: cannot validate (SCOTT.PKENO) - primary key violated 
+
+
+SQL> SELECT * FROM TEST1;
+
+LOCATION                            EMPNO ENAME                       SAL       
+------------------------------ ---------- -------------------- ----------       
+    MOBILE                                                                      
+----------                                                                      
+NEW YORK                             2000 BLAZ                       5000       
+2523278439                                                                      
+                                                                                
+NEW YORK                             2000 BLAZ                       5000       
+2523278439                                                                      
+                                                                                
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> ALTER TABLE TEST1 ENABLE CONSTRAINT PKENO;
+ALTER TABLE TEST1 ENABLE CONSTRAINT PKENO
+*
+ERROR at line 1:
+ORA-02437: cannot validate (SCOTT.PKENO) - primary key violated 
+
+
+SQL> SELECT ENAME, SAL, SUM(SAL) OVER(ORDER BY SAL) FROM EMP;
+
+ENAME             SAL SUM(SAL)OVER(ORDERBYSAL)                                  
+---------- ---------- ------------------------                                  
+SMITH             800                      800                                  
+JAMES             950                     1750                                  
+ADAMS            1100                     2850                                  
+WARD             1250                     5350                                  
+MARTIN           1250                     5350                                  
+MILLER           1300                     6650                                  
+TURNER           1500                     8150                                  
+ALLEN            1600                     9750                                  
+DOMEN            2345                    12095                                  
+CLARK            2450                    14545                                  
+BLAKE            2850                    17395                                  
+
+ENAME             SAL SUM(SAL)OVER(ORDERBYSAL)                                  
+---------- ---------- ------------------------                                  
+JONES            2975                    20370                                  
+FORD             3000                    26370                                  
+SCOTT            3000                    26370                                  
+KING             5000                    31370                                  
+BLAZ                                     31370                                  
+
+16 rows selected.
+
+SQL> SPOOL OFF

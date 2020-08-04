@@ -1,0 +1,346 @@
+SQL> CL SCR
+
+SQL> SET LINESIZE 100
+SQL> SET PAGESIZE 25
+SQL> CL SCR
+
+SQL> -----SUBQUERY ::: QUERY WITHIN A QUERY
+SQL> -----NESTED QUERY ::: THERE WILL BE OUTER QUERY AS WELL AS INNER QUERY ..
+SQL> ---------------------------------------
+SQL> ----Q: DISPLAY 2ND HIGHEST SALARY
+SQL> SELECT MAX(SAL) FROM EMP;
+
+  MAX(SAL)                                                                                          
+----------                                                                                          
+      8888                                                                                          
+
+SQL> SELECT MAX(SAL) FROM EMP WHERE SAL < 8888;
+
+  MAX(SAL)                                                                                          
+----------                                                                                          
+      5000                                                                                          
+
+SQL> -----
+SQL> SELECT MAX(SAL) FROM EMP WHERE SAL < (
+  2  SELECT MAX(SAL) FROM EMP);
+
+  MAX(SAL)                                                                                          
+----------                                                                                          
+      5000                                                                                          
+
+SQL> ---Q: DISPLAY 3RD HIGHEST SALARY
+SQL> SELECT MAX(SAL) FROM EMP;
+
+  MAX(SAL)                                                                                          
+----------                                                                                          
+      8888                                                                                          
+
+SQL> SELECT MAX(SAL) FROM EMP WHERE SAL < 8888;
+
+  MAX(SAL)                                                                                          
+----------                                                                                          
+      5000                                                                                          
+
+SQL> SELECT MAX(SAL) FROM EMP WHERE SAL < 5000;
+
+  MAX(SAL)                                                                                          
+----------                                                                                          
+      3000                                                                                          
+
+SQL> SELECT MAX(SAL) FROM EMP WHERE SAL < (
+  2  SELECT MAX(SAL) FROM EMP WHERE SAL < (
+  3  SELECT MAX(SAL) FROM EMP));
+
+  MAX(SAL)                                                                                          
+----------                                                                                          
+      3000                                                                                          
+
+SQL> CL SCR
+
+SQL> ---DISPLAY NAME OF EMPLOYEE WHOSE SALARY IS MORE THN THE BLAKE SALARY
+SQL> SELECT SAL FROM EMP WHERE ENAME='BLAKE';
+
+       SAL                                                                                          
+----------                                                                                          
+      2850                                                                                          
+
+SQL> SELECT ENAME  FROM EMP WHERE SAL > 2850;
+
+ENAME                                                                                               
+----------                                                                                          
+JONES                                                                                               
+SCOTT                                                                                               
+KING                                                                                                
+FORD                                                                                                
+AAAAA                                                                                               
+
+SQL> ---
+SQL> SELECT ENAME  FROM EMP WHERE SAL > (
+  2  SELECT SAL FROM EMP WHERE ENAME='BLAKE');
+
+ENAME                                                                                               
+----------                                                                                          
+JONES                                                                                               
+SCOTT                                                                                               
+KING                                                                                                
+FORD                                                                                                
+AAAAA                                                                                               
+
+SQL> CL SCR
+
+SQL> ----DISPLAY NAME OF EMPLOYEE WHOSE JOB IS SAME AS JOB OF BLAKE
+SQL> SELECT JOB FROM EMP WHERE ENAME='BLAKE';
+
+JOB                                                                                                 
+---------                                                                                           
+MANAGER                                                                                             
+
+SQL> SELECT ENAME FROM EMP WHERE JOB='MANAGER';
+
+ENAME                                                                                               
+----------                                                                                          
+JONES                                                                                               
+BLAKE                                                                                               
+CLARK                                                                                               
+
+SQL> ----
+SQL> SELECT ENAME FROM EMP WHERE JOB=(
+  2  SELECT JOB FROM EMP WHERE ENAME='BLAKE');
+
+ENAME                                                                                               
+----------                                                                                          
+JONES                                                                                               
+BLAKE                                                                                               
+CLARK                                                                                               
+
+SQL> CL SCR
+
+SQL> ----Q: DISPLAY NAME OF EMPLOYEE WHO IS NOT MANAGER
+SQL> ----Q: DISPLAY NAME OF EMPLOYEE WHO IS MANAGER
+SQL> SELECT ENAME FROM EMP WHERE EMPNO IN (SELECT MGR FROM EMP);
+
+ENAME                                                                                               
+----------                                                                                          
+FORD                                                                                                
+BLAKE                                                                                               
+KING                                                                                                
+JONES                                                                                               
+SCOTT                                                                                               
+
+SQL> SELECT * FROM EMP;
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO               
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------               
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20               
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30               
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30               
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20               
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30               
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30               
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10               
+      7788 SCOTT      ANALYST         7566 09-DEC-82       3000                    20               
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10               
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30               
+      7876 ADAMS      CLERK           7788 12-JAN-83       1100                    20               
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30               
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20               
+       190 AAAAA                                           8888                                     
+
+14 rows selected.
+
+SQL> SELECT ENAME FROM EMP WHERE EMPNO NOT IN (SELECT MGR FROM EMP);
+
+no rows selected
+
+SQL> SELECT ENAME FROM EMP WHERE EMPNO NOT IN (SELECT MGR FROM EMP WHERE MGR IS NOT NULL);
+
+ENAME                                                                                               
+----------                                                                                          
+TURNER                                                                                              
+CLARK                                                                                               
+WARD                                                                                                
+MARTIN                                                                                              
+ALLEN                                                                                               
+AAAAA                                                                                               
+SMITH                                                                                               
+ADAMS                                                                                               
+JAMES                                                                                               
+
+9 rows selected.
+
+SQL> CL SCR
+
+SQL> ---DISPLAY NAME OF MANAGER
+SQL> SELECT E.ENAME,F.ENAME AS MANAGER FROM EMP E,EMP F
+  2  WHERE E.MGR=F.EMPNO;
+
+ENAME      MANAGER                                                                                  
+---------- ----------                                                                               
+FORD       JONES                                                                                    
+SCOTT      JONES                                                                                    
+JAMES      BLAKE                                                                                    
+TURNER     BLAKE                                                                                    
+MARTIN     BLAKE                                                                                    
+WARD       BLAKE                                                                                    
+ALLEN      BLAKE                                                                                    
+ADAMS      SCOTT                                                                                    
+CLARK      KING                                                                                     
+BLAKE      KING                                                                                     
+JONES      KING                                                                                     
+SMITH      FORD                                                                                     
+
+12 rows selected.
+
+SQL> SELECT F.ENAME AS MANAGER FROM EMP E,EMP F
+  2  WHERE E.MGR=F.EMPNO;
+
+MANAGER                                                                                             
+----------                                                                                          
+JONES                                                                                               
+JONES                                                                                               
+BLAKE                                                                                               
+BLAKE                                                                                               
+BLAKE                                                                                               
+BLAKE                                                                                               
+BLAKE                                                                                               
+SCOTT                                                                                               
+KING                                                                                                
+KING                                                                                                
+KING                                                                                                
+FORD                                                                                                
+
+12 rows selected.
+
+SQL> SELECT DISTINCT E.ENAME,F.ENAME AS MANAGER FROM EMP E,EMP F
+  2  WHERE E.MGR=F.EMPNO;
+
+ENAME      MANAGER                                                                                  
+---------- ----------                                                                               
+BLAKE      KING                                                                                     
+TURNER     BLAKE                                                                                    
+WARD       BLAKE                                                                                    
+FORD       JONES                                                                                    
+SMITH      FORD                                                                                     
+MARTIN     BLAKE                                                                                    
+ADAMS      SCOTT                                                                                    
+SCOTT      JONES                                                                                    
+JONES      KING                                                                                     
+JAMES      BLAKE                                                                                    
+ALLEN      BLAKE                                                                                    
+CLARK      KING                                                                                     
+
+12 rows selected.
+
+SQL> SELECT F.ENAME AS MANAGER FROM EMP E,EMP F
+  2  WHERE E.MGR=F.EMPNO
+  3  .
+SQL> SELECT DISTINCT F.ENAME AS MANAGER FROM EMP E,EMP F
+  2  WHERE E.MGR=F.EMPNO;
+
+MANAGER                                                                                             
+----------                                                                                          
+JONES                                                                                               
+FORD                                                                                                
+SCOTT                                                                                               
+BLAKE                                                                                               
+KING                                                                                                
+
+SQL> ---DISPLAY NUMBER OF MANAGERS
+SQL> SELECT COUNT(*) FROM
+  2  (
+  3  SELECT DISTINCT F.ENAME AS MANAGER FROM EMP E,EMP F
+  4  WHERE E.MGR=F.EMPNO
+  5  );
+
+  COUNT(*)                                                                                          
+----------                                                                                          
+         5                                                                                          
+
+SQL> ---
+SQL> SELECT COUNT(DISTINCT MGR ) FROM EMP;
+
+COUNT(DISTINCTMGR)                                                                                  
+------------------                                                                                  
+                 5                                                                                  
+
+SQL> SELECT * FROM EMP;
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO               
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------               
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20               
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30               
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30               
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20               
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30               
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30               
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10               
+      7788 SCOTT      ANALYST         7566 09-DEC-82       3000                    20               
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10               
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30               
+      7876 ADAMS      CLERK           7788 12-JAN-83       1100                    20               
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30               
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20               
+       190 AAAAA                                           8888                                     
+
+14 rows selected.
+
+SQL> ---DISPLAY NUMBER OF WORKERS
+SQL> SELECT COUNT(*) FROM EMP WHERE EMPNO NOT IN
+  2  (SELECT MGR FROM EMP WHERE MGR IS NOT NULL);
+
+  COUNT(*)                                                                                          
+----------                                                                                          
+         9                                                                                          
+
+SQL> CL SCR
+
+SQL> ----DISPLAY NUMBER OF EMPLOYEE IN EACH DEPT (HAS TO SHOW DNAME)
+SQL> SELECT * FROM EMP;
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO               
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------               
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20               
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30               
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30               
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20               
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30               
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30               
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10               
+      7788 SCOTT      ANALYST         7566 09-DEC-82       3000                    20               
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10               
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30               
+      7876 ADAMS      CLERK           7788 12-JAN-83       1100                    20               
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30               
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20               
+       190 AAAAA                                           8888                                     
+
+14 rows selected.
+
+SQL> SELECT * FROM DEPT;
+
+    DEPTNO DNAME          LOC                                                                       
+---------- -------------- -------------                                                             
+        10 ACCOUNTING     NEW YORK                                                                  
+        20 RESEARCH       DALLAS                                                                    
+        30 SALES          CHICAGO                                                                   
+        40 OPERATIONS     BOSTON                                                                    
+        90 EDP            AAAAA                                                                     
+
+SQL> SELECT DNAME,COUNT(*) FROM EMP E, DEPT D
+  2  WHERE E.DEPTNO=D.DEPTNO
+  3  GROUP BY DNAME;
+
+DNAME            COUNT(*)                                                                           
+-------------- ----------                                                                           
+ACCOUNTING              2                                                                           
+RESEARCH                5                                                                           
+SALES                   6                                                                           
+
+SQL> CL SCR
+
+SQL> ----Q: DISPLAY NAME OF EMPLOYEE HAVING HIGHEST SALARY
+SQL> ----Q: DISPLAY NUMBER OF EMPLOYEE WHOSE SALARY IS LESS THAN 2ND HIGHEST SALARY
+SQL> ----Q: DISPLAY NAME OF MANAERS , WITH DNAME
+SQL> ----Q: DISPLAY NAME OF WORKERS , WITH DNAME
+SQL> ----Q: DISPLAY NUMBER OF WORKERS UNDER EACH MANAGER
+SQL> SPOOL OFF

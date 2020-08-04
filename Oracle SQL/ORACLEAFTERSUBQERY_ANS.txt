@@ -1,0 +1,57 @@
+SQL> select even from (
+  2  select level as even from dual connect by level <= 20)
+  3  where mod(even, 2)=0;
+
+      EVEN
+----------
+         2
+         4
+         6
+         8
+        10
+        12
+        14
+        16
+        18
+        20
+
+10 rows selected.
+
+SQL> select substr('oracle', level, 1) from dual connect by level <= length('oracle');
+
+SUBS
+----
+o
+r
+a
+c
+l
+e
+
+6 rows selected.
+
+SQL> select substr(rpad(level, level+1, '*'), 2) as stars from dual connect by level <= 5;
+
+STARS
+----------------------------------------------------------------------------------------------------
+*
+**
+***
+****
+*****
+
+SQL> select decode(level, '1', '*', '2', '**', '3', '***', '4', '****', '5', '*****', '6', '****', '7', '***', '8', '**', '9', '*','') as stars from dual connect by level <=9;
+
+STARS
+-----
+*
+**
+***
+****
+*****
+****
+***
+**
+*
+
+9 rows selected.

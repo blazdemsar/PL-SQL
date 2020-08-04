@@ -1,0 +1,31 @@
+1.DISPLAY MIDDLE RECORD FROM TABLE 
+2.Write a query to display employee records having same salary?
+3.I have table FOOTBALL having one column team, the data in the table as below (APPLY <, >) 
+
+team
+-----
+IND
+PAK
+BAN
+SRI
+
+output:
+-------
+team_a team_b
+------ ------
+IND PAK
+IND BAN
+IND SRI
+PAK BAN
+PAK SRI
+BAN SRI
+
+4.List all the Employees who have at least one person reporting to them.
+5.List the highest salary paid for each job.
+6.In which year did most people join the company? Display the year and the number of Employees. 
+7. Write a correlated sub-query to list out the Employees who earn more than the average salary of their department. 
+8. Select the duplicate records (Records, which are inserted, that already exist) in the EMPLOYEE table. 
+9. Display 2nd highest salary of each job 
+10. Display number of employee with same salary 
+11. Display Number of managers with dept name 
+12. Display name of managers having haighest paid employee under him 

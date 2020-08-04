@@ -1,0 +1,104 @@
+SQL> ----QUESTION 1
+SQL> SELECT * FROM EMP WHERE ROWID = (SELECT MAX(ROWID) FROM EMP WHERE ROWNUM < ((SELECT COUNT(*) FROM EMP) / 2));
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+
+SQL> ----QUESTION 2
+SQL> SELECT DISTINCT SAL, COUNT(*) FROM EMP GROUP BY SAL HAVING COUNT(*) > 1;
+
+       SAL   COUNT(*)
+---------- ----------
+      3000          2
+      1250          2
+
+SQL> ----QUESTION 3
+SQL> SELECT A.TEAM AS "A_TEAM", B.TEAM AS "B_TEAM" FROM FOOTBALL A, FOOTBALL B WHERE A.TEAM < B.TEAM;
+
+A_TEAM     B_TEAM
+---------- ----------
+IND        PAK
+IND        SRI
+PAK        SRI
+BAN        IND
+BAN        PAK
+BAN        SRI
+
+SQL> ----QUESTION 4
+SQL> SELECT DISTINCT F.ENAME, COUNT(*) FROM EMP E, EMP F WHERE E.MGR=F.EMPNO GROUP BY F.ENAME;
+
+ENAME        COUNT(*)
+---------- ----------
+JONES               2
+KING                3
+CLARK               1
+SCOTT               1
+BLAKE               5
+FORD                1
+
+6 rows selected.
+
+SQL> ----QUESTION 5
+SQL> SELECT MAX(SAL), JOB FROM EMP WHERE JOB IS NOT NULL GROUP BY JOB;
+
+  MAX(SAL) JOB
+---------- ---------
+      1300 CLERK
+      1600 SALESMAN
+      3000 ANALYST
+      2975 MANAGER
+      5000 PRESIDENT
+
+SQL> ----QUESTION 7
+SQL> SELECT ENAME, SAL ,DEPTNO FROM EMP E WHERE SAL > (SELECT AVG(SAL) FROM EMP WHERE DEPTNO=E.DEPTNO);
+
+ENAME             SAL     DEPTNO
+---------- ---------- ----------
+ALLEN            1600         30
+JONES            2975         20
+BLAKE            2850         30
+SCOTT            3000         20
+KING             5000         10
+FORD             3000         20
+
+6 rows selected.
+
+SQL> ----QUESTION 8
+SQL> SELECT ENAME, COUNT(*) FROM EMP GROUP BY ENAME HAVING COUNT(*) > 1;
+
+no rows selected
+
+SQL> ----QUESTION 9
+
+
+SQL> ----QUESTION 10
+SQL> SELECT COUNT(*) FROM (SELECT DISTINCT SAL, COUNT(*) FROM EMP GROUP BY SAL HAVING COUNT(*) > 1);
+
+  COUNT(*)
+----------
+         2
+
+SQL> ----QUESTION 11
+SQL> SELECT D.DNAME, COUNT(*) FROM EMP E, EMP F, DEPT D
+SQL> WHERE E.MGR=F.EMPNO AND F.DEPTNO=D.DEPTNO
+SQL> GROUP BY D.DNAME;
+
+DNAME            COUNT(*)
+-------------- ----------
+RESEARCH                4
+SALES                   5
+ACCOUNTING              4
+
+SQL> ----QUESTION 12
+SQL> SELECT E.ENAME, F.ENAME AS MANAGER FROM EMP E, EMP F
+  2  WHERE E.MGR=F.EMPNO AND E.ENAME=
+  3  (SELECT ENAME FROM
+  4  (SELECT ENAME, SAL FROM EMP WHERE EMPNO NOT IN (SELECT MGR FROM EMP WHERE MGR IS NOT NULL) ORDER BY SAL DESC)
+  5  WHERE ROWNUM=1);
+
+ENAME      MANAGER
+---------- ----------
+ALLEN      BLAKE
+
+

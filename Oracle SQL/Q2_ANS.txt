@@ -1,0 +1,96 @@
+SQL> ----QUESTION 1
+SQL> SELECT F.ENAME FROM EMP E, EMP F WHERE SAL=(
+  2  SELECT MAX(SAL
+  3  .
+SQL> SELECT ENAME FROM EMP WHERE SAL=(
+  2  SELECT MAX(SAL) FROM (
+  3  SELECT F.SAL FROM EMP E, EMP F WHERE E.MGR=F.EMPNO));
+
+ENAME
+----------
+KING
+
+SQL> ----QUESTION 2
+SQL> SELECT MAX(SAL) FROM (
+  2  SELECT ENAME, SAL FROM EMP WHERE EMPNO NOT IN (SELECT F.EMPNO FROM EMP E, EMP F WHERE E.MGR=F.EMPNO)
+  3  );
+
+  MAX(SAL)
+----------
+      1600
+
+SQL> ----QUESTION 3
+SQL> SELECT E.ENAME, D.DNAME FROM EMP E, DEPT D WHERE (E.SAL, E.DEPTNO) IN (
+  2  SELECT MAX(SAL), DEPTNO FROM (
+  3  SELECT DISTINCT D.DNAME, D.DEPTNO, E.SAL FROM EMP E, DEPT D WHERE E.DEPTNO=D.DEPTNO)
+  4  GROUP BY DEPTNO)
+  5  AND E.DEPTNO=D.DEPTNO;
+
+ENAME      DNAME
+---------- --------------
+KING       ACCOUNTING
+SCOTT      RESEARCH
+FORD       RESEARCH
+BLAKE      SALES
+MILLER     OPERATIONS
+
+SQL> ----QUESTION 4
+SQL> SELECT SAL FROM
+  2  (SELECT DISTINCT SAL FROM EMP WHERE SAL IS NOT NULL ORDER BY SAL)
+  3  WHERE ROWNUM < 6;
+
+       SAL
+----------
+       800
+       950
+      1100
+      1250
+      1300
+
+SQL> ----QUESTION 5
+SQL> SELECT * FROM EMP WHERE ROWNUM <= ((SELECT COUNT(*) FROM EMP) / 2);
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+
+7 rows selected.
+
+SQL> ---- QUESTION 6
+SQL> SELECT * FROM EMP
+  2  MINUS
+  3  SELECT * FROM EMP WHERE ROWNUM <= ((SELECT COUNT(*) FROM EMP) / 2);
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7788 SCOTT      ANALYST         7566 09-DEC-82       3000                    20
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
+      7876 ADAMS      CLERK           7788 12-JAN-83       1100                    20
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+      7934 MILLER     CLERK           7782 23-JAN-82       1300                    40
+
+7 rows selected.
+
+SQL> ----QUESTION 7
+SQL> SELECT * FROM EMP WHERE ROWNUM <= ((SELECT COUNT(*) FROM EMP) / 2)
+  2  MINUS
+  3  SELECT * FROM EMP WHERE ROWNUM = 1;
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+
+6 rows selected.
